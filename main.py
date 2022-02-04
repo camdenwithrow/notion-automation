@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import json
 import requests
+import schedule
+import time
 
 from notion import NotionApi
 
@@ -83,10 +85,21 @@ def habit_tracker(api):
 
 def main():
     api = NotionApi(NOTION_API_KEY)
+    print("Running")
     tomorrow_to_today(api)
     delete_checked(api)
     habit_tracker(api)
+    print("Run finished")
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    try:
+        schedule.every().day.at("1:00").do(main)
+        print("Starting, press Ctrl+C to exit")
+
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Process exited")
