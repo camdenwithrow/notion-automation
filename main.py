@@ -95,7 +95,7 @@ def main():
 if __name__ == '__main__':
     # main()
     try:
-        schedule.every().day.at("1:00").do(main)
+        schedule.every().day.at("01:00").do(main)
         print("Starting, press Ctrl+C to exit")
 
         while True:
