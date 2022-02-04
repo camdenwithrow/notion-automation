@@ -23,19 +23,18 @@ def auth(headers):
     return headers.get("Authorization") == "Bearer " + AUTH_KEY
 
 
-
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return make_response(jsonify(message="notion quick add api"), 200)
 
 
-@app.route('/health')
+@app.route('/health', methods=['GET'])
 def health():
     if not auth(request.headers): return create_resp(message="Unauthorized", status=401)
     return make_response(jsonify(message="healthy"), 200)
 
 
-@app.route('/quicktodo')
+@app.route('/quicktodo', methods=['POST'])
 def quicktodo():
     """add new todo into todo section from request"""
     if not auth(request.headers): return create_resp(message="Unauthorized", status=401)
