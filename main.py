@@ -10,6 +10,7 @@ load_dotenv()
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 TODO_LIST_ID = os.getenv("TODO_LIST_ID")
 TOMORROW_LIST_ID = os.getenv("TOMORROW_LIST_ID")
+HABITS_LIST_ID = os.getenv("HABITS_LIST_ID")
 
 
 def check_request(resp):
@@ -36,8 +37,6 @@ def delete_checked(api):
     delete_resps = [api.delete_block(id) for id in to_delete]
     for resp in delete_resps:
         check_request(resp)
-
-    return delete_resps
 
 
 def tomorrow_to_today(api):
@@ -70,14 +69,23 @@ def tomorrow_to_today(api):
         for resp in delete_resps:
             check_request(resp)
 
-        return (update_resp, delete_resps)
-    return None
+def habit_tracker(api):
+    """Uncheck completed habits and add them to habit tracker"""
+    habit_resp = api.get_block_children(HABITS_LIST_ID, 100)
+    check_request(habit_resp)
 
+    habits_results = json.loads(habit_resp.content)["results"]
+    for habit in habits_results:
+        if habit["type"] == "to_do" and habit["to_do"]["checked"]:
+            # uncheck habit
+            update_resp = api.update_block(habit["id"], {"to_do": {"checked": False}})
+            check_request(update_resp)
 
 def main():
     api = NotionApi(NOTION_API_KEY)
     tomorrow_to_today(api)
     delete_checked(api)
+    habit_tracker(api)
 
 
 if __name__ == '__main__':
